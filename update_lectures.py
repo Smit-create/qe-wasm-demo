@@ -69,14 +69,33 @@ out_dir = 'content'
 notebook_dir = os.path.abspath(os.path.join(out_dir, 'lectures'))
 
 shutil.copytree(in_dir, notebook_dir, dirs_exist_ok=True)
-
 cwd = os.getcwd()
-
-
 os.chdir(cwd)
 
 
 lectures = glob.glob(out_dir + '/lectures/*.md')
+
+# Replace `!pip` with `%pip`
+for file in lectures:
+    with open(file, 'r') as f:
+        lines = f.readlines()
+
+    out_lines = []
+    for index, line in enumerate(lines):
+        if "!pip" in line:
+            line_ = line.replace("!pip", "%pip")
+            out_lines.append(line_)
+        elif "! pip" in line:
+            line_ = line.replace("! pip", "%pip")
+            out_lines.append(line_)
+        elif "pip" in line:
+            line_ = line.replace("pip", "%pip")
+            out_lines.append(line_)
+        else:
+            out_lines.append(line)
+
+    with open(file, 'w') as f:
+        f.writelines(out_lines)
 
 os.chdir(notebook_dir)
 cmd = "jupytext --to ipynb *.md"
